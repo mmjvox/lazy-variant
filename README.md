@@ -37,7 +37,7 @@ Keeping this as a separate library is cleaner than dragging the whole ORM into p
 ### Build from source
 
 ```bash
-git clone <your-repository-url> lazyvariant
+git clone git@github.com:mmjvox/lazy-variant.git lazyvariant
 cd lazyvariant
 cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
 cmake --build build
@@ -103,17 +103,16 @@ target_link_libraries(app PRIVATE lazyvariant)
 
 ```cpp
 #include <DbVariant.h>
-#include <iostream>
 
-int main() {
-    LazyOrm::DbVariant id = 42;
-    LazyOrm::DbVariant name = "Ilya";
-    LazyOrm::DbVariant active = true;
+    using namespace LazyOrm;
+
+    DbVariant id = 42;
+    DbVariant name = "Ilya";
+    DbVariant active = true;
 
     std::cout << id.toLongLong() << "\n";      // 42
     std::cout << name.toString() << "\n";     // Ilya
     std::cout << active.toBool() << "\n";     // 1
-}
 ```
 
 ## Result usage
@@ -121,24 +120,34 @@ int main() {
 ```cpp
 #include <Result.h>
 #include <ResultRow.h>
-#include <iostream>
 
-int main() {
-    LazyOrm::ResultRow row;
-    row.insert("id", 1);
-    row.insert("name", "Kimia");
-    row.insert("active", true);
+    using namespace LazyOrm;
 
-    LazyOrm::Result result;
-    result.push_back(row);
-    result.setAffectedRows(1);
-    result.setColumnNames({"id", "name", "active"});
+    Result result;
+    
+    auto affectedRows = result.affectedRows();    
+    std::cout << "Affected rows: " << affectedRows << "\n";
+    
+    
+    auto rowsCount = result.size();    
+    std::cout << "Count of rows: " << rowsCount << "\n";
+    
+    if(rowsCount>0){
+        ResultRow row = result[0];
+        std::cout << "name: " << row["name"] << "\n";
+    }
 
     std::cout << result.toString() << "\n";
-}
+
 ```
 
 Example output:
+
+```
+Affected rows: 0
+Count of rows: 1
+name: Kimia
+```
 
 ```json
 [{"active":true,"name":"Kimia","id":1}]
