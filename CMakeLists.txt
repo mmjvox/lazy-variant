@@ -64,7 +64,7 @@ install(FILES ${LazyORM_HEADERS}
         DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/LazyVariant)
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/lazyvariantConfig.cmake
 #              ${CMAKE_CURRENT_BINARY_DIR}/FooConfigVersion.cmake
-        DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/lazyvariant)
+        DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/lazyorm)
 install(TARGETS lazyvariant
     #PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/LazyVariant
     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
