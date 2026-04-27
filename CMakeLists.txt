@@ -33,10 +33,10 @@ add_library(lazyvariant STATIC
 target_compile_definitions(lazyvariant PRIVATE LazyVariant_LIBRARY)
 
 
-option(tests "build tests" OFF)
-if(tests)
+option(variant_tests "build tests of lazy variant" OFF)
+if(variant_tests)
 add_subdirectory(tests)
-endif(tests)
+endif(variant_tests)
 
 
 target_include_directories(lazyvariant PUBLIC include)
