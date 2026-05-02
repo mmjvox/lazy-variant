@@ -34,6 +34,14 @@ std::string LazyOrm::DbVariant::toString() const
         else if constexpr (std::is_same_v<T, bool>) {
                 return arg?"true":"false";
         }
+        else if constexpr (std::is_same_v<T, BlobType>) {
+            std::string result;
+            result.reserve(arg.size());
+            for (std::byte b : arg) {
+                result.push_back(static_cast<char>(b));
+            }
+            return result;
+        }
         return "";
     }, *this);
 }
@@ -44,6 +52,9 @@ std::string LazyOrm::DbVariant::typeName() const
         using T = std::decay_t<decltype(arg)>;
         if constexpr (std::is_same_v<T, std::string>) {
             return "string";
+        }
+        else if constexpr (std::is_same_v<T, BlobType>) {
+            return "blob";
         }
         else if constexpr (std::is_same_v<T, UnsignedIntegerVariant>) {
             return "uint";
@@ -56,6 +67,9 @@ std::string LazyOrm::DbVariant::typeName() const
         }
         else if constexpr (std::is_same_v<T, bool>) {
             return "boolean";
+        }
+        else if constexpr (std::is_same_v<T, BlobType>) {
+            return "blob";
         }
         return "";
     }, *this);
@@ -459,7 +473,10 @@ bool LazyOrm::DbVariant::toBool() const
         if constexpr (std::is_same_v<T, bool>) {
             return  arg;
         }
-        if constexpr (std::is_same_v<T, std::string>) {
+        else if constexpr (std::is_same_v<T, BlobType>) {
+            return !arg.empty();
+        }
+        else if constexpr (std::is_same_v<T, std::string>) {
             return !arg.empty();
         }
         else if constexpr (std::is_same_v<T, SignedFloatingPointVariant>) {
@@ -501,14 +518,17 @@ bool LazyOrm::DbVariant::empty()
 
         using T = std::decay_t<decltype(arg)>;
 
-        if constexpr (std::is_same_v<T, std::string>) {
-            if(!arg.empty())
-            {
-                return false;
-            }
+        if constexpr (std::is_same_v<T, std::monostate>){
+            return true;
+        }
+        else if constexpr (std::is_same_v<T, std::string>) {
+            return arg.empty();
+        }
+        else if constexpr (std::is_same_v<T, BlobType>) {
+            return arg.empty();
         }
 
-        return true;
+        return false;
 
     }, *this);
 }
@@ -519,11 +539,20 @@ const size_t LazyOrm::DbVariant::lenght() const
 
         using T = std::decay_t<decltype(arg)>;
 
-        if constexpr (std::is_same_v<T, std::string>) {
+        if constexpr (std::is_same_v<T, std::monostate>) {
+            return 0;
+        }
+        else if constexpr (std::is_same_v<T, std::string>) {
             return arg.length();
         }
+        else if constexpr (std::is_same_v<T, BlobType>) {
+            return arg.size();
+        }
+        else if constexpr (std::is_same_v<T, bool>) {
+            return 1;
+        }
 
-        return 0;
+        return toString().length();
 
     }, *this);
 }
@@ -864,7 +893,58 @@ bool LazyOrm::DbVariant::operator==(bool b)
     return toBool() == b;
 }
 
+bool LazyOrm::DbVariant::operator==(BlobType b)
+{
+    return toBlob() == b;
+}
+
+
 const std::string LazyOrm::DbVariant::as(const std::string &columnName, const std::string &asName)
 {
     return columnName + " as " + asName;
+}
+
+bool LazyOrm::DbVariant::isBlob() const
+{
+    return std::visit([](auto&& arg) -> bool {
+        using T = std::decay_t<decltype(arg)>;
+        if constexpr (std::is_same_v<T, BlobType>) {
+            return true;
+        }
+        return false;
+    }, *this);
+}
+
+LazyOrm::BlobType LazyOrm::DbVariant::toBlob() const
+{
+    return std::visit([this](auto&& arg) -> BlobType {
+        using T = std::decay_t<decltype(arg)>;
+        if constexpr (std::is_same_v<T, BlobType>) {
+            return arg;
+        }
+        else if constexpr (std::is_same_v<T, std::string>) {
+            // تبدیل string به blob
+            BlobType blob;
+            blob.reserve(arg.size());
+            for (char c : arg) {
+                blob.push_back(static_cast<ByteType>(c));
+            }
+            return blob;
+        }
+        else if constexpr (std::is_same_v<T, bool>) {
+            BlobType blob;
+            blob.push_back(static_cast<ByteType>(arg ? 1 : 0));
+            return blob;
+        }
+        else {
+            // برای انواع دیگر، به string تبدیل کن
+            std::string str = toString();
+            BlobType blob;
+            blob.reserve(str.size());
+            for (char c : str) {
+                blob.push_back(static_cast<ByteType>(c));
+            }
+            return blob;
+        }
+    }, *this);
 }

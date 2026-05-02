@@ -7,6 +7,10 @@
 #include <list>
 #include <vector>
 
+#ifdef __cpp_lib_byte
+#include <cstddef>
+#endif
+
 namespace LazyOrm {
 
 enum Filters
@@ -37,11 +41,19 @@ enum class Having
     NOT,
 };
 
+#ifdef __cpp_lib_byte
+using ByteType = std::byte;
+#else
+using ByteType = uint8_t;
+#endif
+
+
 using UnsignedIntegerVariant = std::variant<unsigned short, unsigned int, unsigned long, unsigned long long>;
 using SignedIntegerVariant = std::variant<short, int, long, long long>;
 using SignedFloatingPointVariant = std::variant<float, double, long double>;
+using BlobType = std::vector<ByteType>;
 
-class DbVariant : public std::variant<std::monostate,std::string,UnsignedIntegerVariant,SignedIntegerVariant,SignedFloatingPointVariant,bool>
+class DbVariant : public std::variant<std::monostate,std::string,UnsignedIntegerVariant,SignedIntegerVariant,SignedFloatingPointVariant,bool,BlobType>
 {
 #ifdef DEBUG_MODE
 public:
@@ -79,7 +91,7 @@ private:
 
 
 public:
-    using std::variant<std::monostate,std::string,UnsignedIntegerVariant,SignedIntegerVariant,SignedFloatingPointVariant,bool>::variant;
+    using std::variant<std::monostate,std::string,UnsignedIntegerVariant,SignedIntegerVariant,SignedFloatingPointVariant,bool,BlobType>::variant;
 
     DbVariant& set(DbVariant newVariant);
 
@@ -90,6 +102,8 @@ public:
     long long toLongLong() const;
     long double toLongDouble() const;
     bool toBool() const;
+    bool isBlob() const;
+    BlobType toBlob() const;
 
     std::string toLowerString() const;
     std::string toUpperString() const;
@@ -119,6 +133,7 @@ public:
     bool operator==(long long);
     bool operator==(long double);
     bool operator==(bool);
+    bool operator==(BlobType);
 
     static const std::string as(const std::string &columnName, const std::string &asName);
 };
