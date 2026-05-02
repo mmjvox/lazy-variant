@@ -923,7 +923,6 @@ LazyOrm::BlobType LazyOrm::DbVariant::toBlob() const
             return arg;
         }
         else if constexpr (std::is_same_v<T, std::string>) {
-            // تبدیل string به blob
             BlobType blob;
             blob.reserve(arg.size());
             for (char c : arg) {
@@ -937,7 +936,6 @@ LazyOrm::BlobType LazyOrm::DbVariant::toBlob() const
             return blob;
         }
         else {
-            // برای انواع دیگر، به string تبدیل کن
             std::string str = toString();
             BlobType blob;
             blob.reserve(str.size());
