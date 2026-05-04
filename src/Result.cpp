@@ -57,21 +57,26 @@ void Result::setAffectedRows(size_t affectedRows)
 
 void Result::setColumnNames(const std::vector<std::string> &columnNames)
 {
-    mColumnNames = columnNames;
+    mColumnNamesPtr = std::make_shared<std::vector<std::string>>(columnNames);
 }
 
-std::vector<std::string> Result::columnNames(){
-    return mColumnNames;
+void Result::setColumnNames(std::shared_ptr<std::vector<std::string> > columnNamesPtr)
+{
+    mColumnNamesPtr = columnNamesPtr;
 }
 
-std::string Result::columnName(size_t index){
-    if(mColumnNames.size()>index)
-        return mColumnNames[index];
+std::vector<std::string> Result::columnNames() const{
+    return *mColumnNamesPtr;
+}
+
+std::string Result::columnName(size_t index) const{
+    if(mColumnNamesPtr->size()>index)
+        return mColumnNamesPtr->at(index);
     return "";
 }
 
 size_t Result::columnsSize() const{
-    return mColumnNames.size();
+    return mColumnNamesPtr->size();
 }
 
 unsigned long long Result::insertId() const {
@@ -87,7 +92,10 @@ ResultRow Result::value(unsigned long long index)
     if(index < std::vector<ResultRow>::size()){
         return std::vector<ResultRow>::at(index);
     }
-    return {};
+
+    ResultRow row;
+    row.setColumnNamesPtr(this->mColumnNamesPtr);
+    return row;
 }
 
 }

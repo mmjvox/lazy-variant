@@ -5,13 +5,18 @@
 #include "DbVariant.h"
 #include <string>
 #include <unordered_map>
+#include <memory>
 
 namespace LazyOrm {
 
-class ResultRow : public std::unordered_map<std::string,DbVariant>
+class ResultRow : public std::unordered_map<uint,DbVariant>
 {
+private:
+    std::shared_ptr<std::vector<std::string>> mColumnNamesPtr = std::make_shared<std::vector<std::string>>();
+    const int findColumnIndex(const std::string &name) const;
+
 public:
-    using std::unordered_map<std::string,DbVariant>::unordered_map;
+    using std::unordered_map<uint,DbVariant>::unordered_map;
 
     std::string toString() const;
     std::string toIndentedString() const;
@@ -23,6 +28,7 @@ public:
     DbVariant at(unsigned long long columnIndex) const;
     DbVariant value(unsigned long long columnIndex) const;
 
+    void setColumnNamesPtr(std::shared_ptr<std::vector<std::string> > newColumnNamesPtr);
 };
 
 }
