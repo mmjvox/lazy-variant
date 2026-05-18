@@ -93,7 +93,7 @@ LazyOrm::DbVariant ResultRow::at(unsigned long long columnIndex) const
 
 LazyOrm::DbVariant ResultRow::value(unsigned long long columnIndex) const
 {
-    return at(columnIndex);
+    return ResultRow::at(columnIndex);
 }
 
 void ResultRow::setColumnNamesPtr(std::shared_ptr<std::vector<std::string> > newColumnNamesPtr)

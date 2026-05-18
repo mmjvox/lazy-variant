@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.15)
-project(lazyvariant VERSION 1.2.2 LANGUAGES CXX)
+project(lazyvariant VERSION 1.2.3 LANGUAGES CXX)
 add_definitions (-Dlazy_orm_version="${CMAKE_PROJECT_VERSION}")
 
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
