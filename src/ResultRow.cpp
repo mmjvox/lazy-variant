@@ -66,9 +66,9 @@ void ResultRow::insert(const std::string key, const DbVariant dbVariant)
 {
     const auto &index = findColumnIndex(key);
     if(index<0){
-        const auto &index = mColumnNamesPtr->size();
+        const auto &newIndex = mColumnNamesPtr->size();
         mColumnNamesPtr->push_back(key);
-        insert_or_assign(index, dbVariant);
+        insert_or_assign(newIndex, dbVariant);
     }
 }
 
