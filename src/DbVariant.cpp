@@ -535,7 +535,7 @@ bool LazyOrm::DbVariant::empty()
 
 const size_t LazyOrm::DbVariant::length() const
 {
-    return std::visit([=](auto&& arg) -> bool {
+    return std::visit([=](auto&& arg) -> size_t {
 
         using T = std::decay_t<decltype(arg)>;
 
