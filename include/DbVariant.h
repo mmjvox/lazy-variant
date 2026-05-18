@@ -109,7 +109,7 @@ public:
     std::string toUpperString() const;
 
     bool empty();
-    const size_t lenght() const;
+    const size_t length() const;
     bool contains(std::string substr) const;
     bool startsWith(std::string prefix, bool caseSensitive=true) const;
     std::string trim() const;

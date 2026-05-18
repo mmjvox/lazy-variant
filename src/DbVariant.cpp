@@ -533,7 +533,7 @@ bool LazyOrm::DbVariant::empty()
     }, *this);
 }
 
-const size_t LazyOrm::DbVariant::lenght() const
+const size_t LazyOrm::DbVariant::length() const
 {
     return std::visit([=](auto&& arg) -> bool {
 
