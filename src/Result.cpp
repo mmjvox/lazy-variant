@@ -188,6 +188,16 @@ Result::emplace(const_iterator position, Args&&... args) {
     return Base::emplace(position, std::move(row));
 }
 
+QueryState Result::queryState() const
+{
+    return mQueryState;
+}
+
+void Result::setQueryState(QueryState newQueryState)
+{
+    mQueryState = newQueryState;
+}
+
 const int Result::findColumnIndex(const std::string &name) const
 {
     const auto it= std::find(mColumnNamesPtr->begin(), mColumnNamesPtr->end(), name);

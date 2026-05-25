@@ -8,12 +8,21 @@
 
 namespace LazyOrm {
 
+enum QueryState{
+    UndefinedQuery,
+    QuerySuccess,
+    QueryFailed,
+    QueryExecuting,
+    NoResultQuery
+};
+
 class ResultRow;
 
 class Result : public std::vector<ResultRow>
 {
 private:
     using Base = std::vector<ResultRow>;
+    QueryState mQueryState;
     std::string mErrorMessage;
     size_t mAffectedRows;
     unsigned long long mInsertId=0;
@@ -77,6 +86,9 @@ public:
     ResultRow& at(size_t index);
 
     const ResultRow& at(size_t index) const;
+
+    QueryState queryState() const;
+    void setQueryState(QueryState newQueryState);
 };
 
 }
