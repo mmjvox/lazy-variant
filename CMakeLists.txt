@@ -39,8 +39,11 @@ add_subdirectory(tests)
 endif(variant_tests)
 
 
-target_include_directories(lazyvariant PUBLIC include)
-
+target_include_directories(lazyvariant
+    PUBLIC
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+    $<INSTALL_INTERFACE:include>
+)
 
 string(JOIN ";" LazyVAR_HEADERS_STRING ${LazyVAR_HEADERS})
 set_target_properties(lazyvariant PROPERTIES
