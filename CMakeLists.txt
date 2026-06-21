@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.15)
 project(lazyvariant VERSION 1.3.0 LANGUAGES CXX)
-add_definitions (-Dlazy_orm_version="${CMAKE_PROJECT_VERSION}")
+add_definitions (-Dlazy_variant_version="${CMAKE_PROJECT_VERSION}")
 
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
     add_definitions(-DDEBUG_MODE)
@@ -14,7 +14,7 @@ include_directories(
     include/
 )
 
-set(LazyORM_HEADERS
+set(LazyVAR_HEADERS
     include/DbVariant.h
     include/DbList.h
     include/Result.h
@@ -22,7 +22,7 @@ set(LazyORM_HEADERS
 )
 
 add_library(lazyvariant STATIC
-    ${LazyORM_HEADERS}
+    ${LazyVAR_HEADERS}
 
     src/DbVariant.cpp
     src/DbList.cpp
@@ -42,9 +42,9 @@ endif(variant_tests)
 target_include_directories(lazyvariant PUBLIC include)
 
 
-string(JOIN ";" LazyORM_HEADERS_STRING ${LazyORM_HEADERS})
+string(JOIN ";" LazyVAR_HEADERS_STRING ${LazyVAR_HEADERS})
 set_target_properties(lazyvariant PROPERTIES
-    PUBLIC_HEADER "${LazyORM_HEADERS_STRING}"
+    PUBLIC_HEADER "${LazyVAR_HEADERS_STRING}"
 )
 
 # install(TARGETS lazyvariant)
@@ -60,11 +60,11 @@ configure_package_config_file(
     ${CMAKE_INSTALL_LIBDIR}/cmake/lazyvariant
 )
 
-install(FILES ${LazyORM_HEADERS}
+install(FILES ${LazyVAR_HEADERS}
         DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/LazyVariant)
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/lazyvariantConfig.cmake
 #              ${CMAKE_CURRENT_BINARY_DIR}/FooConfigVersion.cmake
-        DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/lazyorm)
+        DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/lazyvariant)
 install(TARGETS lazyvariant
     #PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/LazyVariant
     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
