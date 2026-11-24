@@ -6,6 +6,68 @@
 #include <sstream>
 #include <cmath>
 #include <algorithm>
+#include <utility>
+
+LazyOrm::DbListType::DbListType(std::vector<DbVariant> values)
+    : mValues(std::move(values))
+{
+}
+
+size_t LazyOrm::DbListType::size() const
+{
+    return mValues.size();
+}
+
+bool LazyOrm::DbListType::empty() const
+{
+    return mValues.empty();
+}
+
+const LazyOrm::DbVariant &LazyOrm::DbListType::at(size_t index) const
+{
+    return mValues.at(index);
+}
+
+std::vector<LazyOrm::DbVariant>::const_iterator LazyOrm::DbListType::begin() const
+{
+    return mValues.begin();
+}
+
+std::vector<LazyOrm::DbVariant>::const_iterator LazyOrm::DbListType::end() const
+{
+    return mValues.end();
+}
+
+bool LazyOrm::DbListType::operator<(const DbListType &other) const
+{
+    if (size() != other.size()) {
+        return size() < other.size();
+    }
+    for (size_t i = 0; i < size(); ++i) {
+        const auto &lhs = static_cast<const DbVariant::Base &>(at(i));
+        const auto &rhs = static_cast<const DbVariant::Base &>(other.at(i));
+        if (lhs < rhs) {
+            return true;
+        }
+        if (rhs < lhs) {
+            return false;
+        }
+    }
+    return false;
+}
+
+bool LazyOrm::DbListType::operator==(const DbListType &other) const
+{
+    if (size() != other.size()) {
+        return false;
+    }
+    for (size_t i = 0; i < size(); ++i) {
+        if (static_cast<const DbVariant::Base &>(at(i)) != static_cast<const DbVariant::Base &>(other.at(i))) {
+            return false;
+        }
+    }
+    return true;
+}
 
 LazyOrm::DbVariant &LazyOrm::DbVariant::set(DbVariant newVariant)
 {
@@ -42,6 +104,16 @@ std::string LazyOrm::DbVariant::toString() const
             }
             return result;
         }
+        else if constexpr (std::is_same_v<T, DbListType>) {
+            std::string result = "[no'](";
+            for (size_t i = 0; i < arg.size(); ++i) {
+                if (i != 0) {
+                    result.append(",");
+                }
+                result.append(arg.at(i).typeName() == "string" ? arg.at(i).setQuote() : arg.at(i).toString());
+            }
+            return result.append(")");
+        }
         return "";
     }, *this);
 }
@@ -68,8 +140,8 @@ std::string LazyOrm::DbVariant::typeName() const
         else if constexpr (std::is_same_v<T, bool>) {
             return "boolean";
         }
-        else if constexpr (std::is_same_v<T, BlobType>) {
-            return "blob";
+        else if constexpr (std::is_same_v<T, DbListType>) {
+            return "list";
         }
         return "";
     }, *this);
@@ -476,6 +548,9 @@ bool LazyOrm::DbVariant::toBool() const
         else if constexpr (std::is_same_v<T, BlobType>) {
             return !arg.empty();
         }
+        else if constexpr (std::is_same_v<T, DbListType>) {
+            return !arg.empty();
+        }
         else if constexpr (std::is_same_v<T, std::string>) {
             return !arg.empty();
         }
@@ -527,6 +602,9 @@ bool LazyOrm::DbVariant::empty()
         else if constexpr (std::is_same_v<T, BlobType>) {
             return arg.empty();
         }
+        else if constexpr (std::is_same_v<T, DbListType>) {
+            return arg.empty();
+        }
 
         return false;
 
@@ -550,6 +628,9 @@ const size_t LazyOrm::DbVariant::length() const
         }
         else if constexpr (std::is_same_v<T, bool>) {
             return 1;
+        }
+        else if constexpr (std::is_same_v<T, DbListType>) {
+            return arg.size();
         }
 
         return toString().length();
@@ -912,6 +993,25 @@ bool LazyOrm::DbVariant::isBlob() const
             return true;
         }
         return false;
+    }, *this);
+}
+
+bool LazyOrm::DbVariant::isList() const
+{
+    return std::visit([](auto&& arg) -> bool {
+        using T = std::decay_t<decltype(arg)>;
+        return std::is_same_v<T, DbListType>;
+    }, *this);
+}
+
+LazyOrm::DbListType LazyOrm::DbVariant::toList() const
+{
+    return std::visit([](auto&& arg) -> DbListType {
+        using T = std::decay_t<decltype(arg)>;
+        if constexpr (std::is_same_v<T, DbListType>) {
+            return arg;
+        }
+        return {};
     }, *this);
 }
 

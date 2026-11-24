@@ -165,6 +165,7 @@ name: Kimia
 - signed integers: `short`, `int`, `long`, `long long`
 - floating-point numbers: `float`, `double`, `long double`
 - `bool`
+- typed lists of `DbVariant` values through `DbList`
 
 ## Useful conversions
 
@@ -216,7 +217,7 @@ ids.toString();    // [no'](1,2,3)
 names.toString();  // [no']('ali','reza','sara')
 ```
 
-`DbList` stores its generated list representation as a string inside `DbVariant`.
+`DbList` stores its elements as typed `DbVariant` values inside `DbVariant`. Its `toString()` method generates the legacy SQL list representation for string-based query building; parameterized query builders can bind each element without stringifying it.
 
 ## API documentation
 

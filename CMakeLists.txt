@@ -17,7 +17,7 @@ set(LazyVAR_HEADERS
     include/ResultRow.h
 )
 
-add_library(lazyvariant STATIC
+add_library(lazyvariant
     ${LazyVAR_HEADERS}
 
     src/DbVariant.cpp
@@ -32,6 +32,7 @@ target_compile_definitions(lazyvariant PRIVATE LazyVariant_LIBRARY)
 
 option(variant_tests "build tests of lazy variant" OFF)
 if(variant_tests)
+enable_testing()
 add_subdirectory(tests)
 endif(variant_tests)
 
