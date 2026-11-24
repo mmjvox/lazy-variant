@@ -53,7 +53,27 @@ using SignedIntegerVariant = std::variant<short, int, long, long long>;
 using SignedFloatingPointVariant = std::variant<float, double, long double>;
 using BlobType = std::vector<ByteType>;
 
-class DbVariant : public std::variant<std::monostate,std::string,UnsignedIntegerVariant,SignedIntegerVariant,SignedFloatingPointVariant,bool,BlobType>
+class DbVariant;
+
+class DbListType
+{
+    std::vector<DbVariant> mValues;
+
+public:
+    DbListType() = default;
+    DbListType(std::vector<DbVariant> values);
+
+    size_t size() const;
+    bool empty() const;
+    const DbVariant &at(size_t index) const;
+    std::vector<DbVariant>::const_iterator begin() const;
+    std::vector<DbVariant>::const_iterator end() const;
+
+    bool operator<(const DbListType &other) const;
+    bool operator==(const DbListType &other) const;
+};
+
+class DbVariant : public std::variant<std::monostate,std::string,UnsignedIntegerVariant,SignedIntegerVariant,SignedFloatingPointVariant,bool,BlobType,DbListType>
 {
 #ifdef DEBUG_MODE
 public:
@@ -91,7 +111,8 @@ private:
 
 
 public:
-    using std::variant<std::monostate,std::string,UnsignedIntegerVariant,SignedIntegerVariant,SignedFloatingPointVariant,bool,BlobType>::variant;
+    using Base = std::variant<std::monostate,std::string,UnsignedIntegerVariant,SignedIntegerVariant,SignedFloatingPointVariant,bool,BlobType,DbListType>;
+    using Base::variant;
 
     DbVariant& set(DbVariant newVariant);
 
@@ -104,6 +125,8 @@ public:
     bool toBool() const;
     bool isBlob() const;
     BlobType toBlob() const;
+    bool isList() const;
+    DbListType toList() const;
 
     std::string toLowerString() const;
     std::string toUpperString() const;
